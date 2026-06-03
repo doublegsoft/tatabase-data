@@ -10,17 +10,12 @@ if (typeof sdk === 'undefined') {
     <#if (widget.type == "select" || widget.type == "multiselect")>
       <#if (widget.value("data")!"")?starts_with("enum[")>
         <#assign enumOpts = typebase.enumtype(widget.value("data"))>
+
 sdk.fetch${js.nameType(widget.id)}Options = async () => {
-  return [{
-        <#list enumOpts as opt>
-          <#if opt?index != 0>
-  },{
-          </#if>
-    value: '${opt.code}', label: '${opt.text}',
-        </#list>
-  }];
+  return sdk.${js.nameVariable(widget.id)}Options
 };        
       <#else>
+
 sdk.fetch${js.nameType(widget.id)}Options = async () => {
   return [{
     value: 'ABC', label: '${tatabase.string(5)}',
@@ -40,6 +35,7 @@ sdk.fetch${js.nameType(widget.id)}Options = async () => {
 };
       </#if>
     <#elseif widget.type == "cascade">
+
 sdk.fetch${js.nameType(widget.id)}Options = async () => {    
   return [{ 
     value: 'bj', label: '北京市', 
@@ -105,6 +101,7 @@ sdk.fetch${js.nameType(widget.id)}Options = async () => {
   }];
 }
     <#elseif widget.type == "paged_table">
+
 sdk.fetch${js.nameType(widget.id)}Rows = async (start, limit) => {
   return {
     total: 100,
@@ -130,5 +127,4 @@ sdk.fetch${js.nameType(widget.id)}Rows = async (start, limit) => {
   </#list>
 </#list>
     
-
 export default sdk
