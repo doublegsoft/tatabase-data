@@ -110,10 +110,10 @@ sdk.fetch${js.nameType(objname)} = async (start, limit) => {
       </#list>    
   }
 };
-
+ss
     <#elseif widget.type == "paged_table" || widget.type == "excel_form">
 
-sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (start, limit) => {
+sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, limit) => {
   return {
     total: 100,
     data: [{
@@ -122,6 +122,7 @@ sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (start, limit) => 
     },{
        </#if>
         <#list widget.children as col>
+          <#if !col.id??><#continue></#if>
           <#if col.type == "date">
       ${js.nameVariable(col.id)}: '${tatabase.date()}',  
           <#elseif col.type == "number">
