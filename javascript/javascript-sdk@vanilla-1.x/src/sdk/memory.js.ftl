@@ -6,17 +6,12 @@ if (typeof sdk === 'undefined') {
 <#list app.pages as page>
   <#list page.widgets as widget>
     <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
-    <#assign visited_widgets += {widget.id: widget}>
+    <#assign objname = widget.value("object", widget.id)>
+    <#assign visited_widgets += {objname: widget}>
     <#if (widget.type == "select" || widget.type == "multiselect")>
-      <#if (widget.value("data")!"")?starts_with("enum[")>
-        <#assign enumOpts = typebase.enumtype(widget.value("data"))>
+      <#if !widget.value("data","")?starts_with("enum[")>
 
-sdk.fetch${js.nameType(widget.id)}Options = async () => {
-  return sdk.${js.nameVariable(widget.id)}Options
-};        
-      <#else>
-
-sdk.fetch${js.nameType(widget.id)}Options = async () => {
+sdk.fetch${js.nameType(inflector.pluralize(objname))} = async () => {
   return [{
     value: 'ABC', label: '${tatabase.string(5)}',
   },{
@@ -99,27 +94,43 @@ sdk.fetch${js.nameType(widget.id)}Options = async () => {
       value: 'nb', label: '宁波市' 
     }]
   }];
-}
-    <#elseif widget.type == "paged_table">
+};
+    <#elseif widget.type == "entry_form" || widget.type == "display_form">
 
-sdk.fetch${js.nameType(widget.id)}Rows = async (start, limit) => {
+sdk.fetch${js.nameType(objname)} = async (start, limit) => {
+  return {
+      <#list widget.children as col>
+        <#if col.type == "date">
+    ${js.nameVariable(col.id)}: '${tatabase.date()}',  
+        <#elseif col.type == "number">
+    ${js.nameVariable(col.id)}: '${tatabase.number(1, 100)}',  
+        <#else>
+    ${js.nameVariable(col.id)}: '${tatabase.string(10)}',
+        </#if>
+      </#list>    
+  }
+};
+
+    <#elseif widget.type == "paged_table" || widget.type == "excel_form">
+
+sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (start, limit) => {
   return {
     total: 100,
     data: [{
-<#list 1..20 as i>      
- <#if i != 1>
+      <#list 1..20 as i>      
+        <#if i != 1>
     },{
- </#if>
-  <#list widget.children as col>
-    <#if col.type == "date">
-  ${js.nameVariable(col.id)}: '${tatabase.date()}',  
-    <#elseif col.type == "number">
-  ${js.nameVariable(col.id)}: '${tatabase.number(1, 100)}',  
-    <#else>
-  ${js.nameVariable(col.id)}: '${tatabase.string(10)}',
-    </#if>
-  </#list>    
-</#list>  
+       </#if>
+        <#list widget.children as col>
+          <#if col.type == "date">
+      ${js.nameVariable(col.id)}: '${tatabase.date()}',  
+          <#elseif col.type == "number">
+      ${js.nameVariable(col.id)}: '${tatabase.number(1, 100)}',  
+          <#else>
+      ${js.nameVariable(col.id)}: '${tatabase.string(10)}',
+          </#if>
+        </#list>    
+      </#list>  
     }]
   };
 };
