@@ -135,6 +135,39 @@ sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, li
     }]
   };
 };
+    <#elseif widget.type == "chart">
+
+sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, limit) => {
+  return {
+    total: 24,
+    data: [
+      { month: '1月',  category: '居民用电',   amount: 320 },
+      { month: '1月',  category: '工商业用电', amount: 180 },
+      { month: '2月',  category: '居民用电',   amount: 280 },
+      { month: '2月',  category: '工商业用电', amount: 190 },
+      { month: '3月',  category: '居民用电',   amount: 260 },
+      { month: '3月',  category: '工商业用电', amount: 210 },
+      { month: '4月',  category: '居民用电',   amount: 240 },
+      { month: '4月',  category: '工商业用电', amount: 230 },
+      { month: '5月',  category: '居民用电',   amount: 250 },
+      { month: '5月',  category: '工商业用电', amount: 250 },
+      { month: '6月',  category: '居民用电',   amount: 310 },
+      { month: '6月',  category: '工商业用电', amount: 270 },
+      { month: '7月',  category: '居民用电',   amount: 420 },
+      { month: '7月',  category: '工商业用电', amount: 300 },
+      { month: '8月',  category: '居民用电',   amount: 480 },
+      { month: '8月',  category: '工商业用电', amount: 310 },
+      { month: '9月',  category: '居民用电',   amount: 380 },
+      { month: '9月',  category: '工商业用电', amount: 280 },
+      { month: '10月', category: '居民用电',   amount: 300 },
+      { month: '10月', category: '工商业用电', amount: 260 },
+      { month: '11月', category: '居民用电',   amount: 290 },
+      { month: '11月', category: '工商业用电', amount: 240 },
+      { month: '12月', category: '居民用电',   amount: 340 },
+      { month: '12月', category: '工商业用电', amount: 200 },
+    ]
+  };
+};    
     </#if>
   </#list>
 </#list>
