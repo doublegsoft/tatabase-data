@@ -11,7 +11,7 @@ if (typeof sdk === 'undefined') {
     <#if (widget.type == "select" || widget.type == "multiselect")>
       <#if !widget.value("data","")?starts_with("enum[")>
 
-sdk.fetch${js.nameType(inflector.pluralize(objname))}Options = async () => {
+sdk.fetch${js.nameType(inflector.pluralize(widget.value("object",widget.id)))}AsOptions = async () => {
   return [{
     value: 'ABC', label: '${tatabase.string(5)}',
   },{
@@ -31,7 +31,7 @@ sdk.fetch${js.nameType(inflector.pluralize(objname))}Options = async () => {
       </#if>
     <#elseif widget.type == "cascade">
 
-sdk.fetch${js.nameType(widget.id)}Options = async () => {    
+sdk.fetch${js.nameType(inflector.pluralize(widget.value("object",widget.id)))}AsOptions = async () => {    
   return [{ 
     value: 'bj', label: '北京市', 
     children: [{ 
