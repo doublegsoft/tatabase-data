@@ -11,7 +11,7 @@ if (typeof sdk === 'undefined') {
     <#if (widget.type == "select" || widget.type == "multiselect")>
       <#if !widget.value("data","")?starts_with("enum[")>
 
-sdk.fetch${js.nameType(inflector.pluralize(objname))} = async () => {
+sdk.fetch${js.nameType(inflector.pluralize(objname))}Options = async () => {
   return [{
     value: 'ABC', label: '${tatabase.string(5)}',
   },{
