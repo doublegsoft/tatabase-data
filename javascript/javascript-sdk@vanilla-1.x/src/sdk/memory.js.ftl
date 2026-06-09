@@ -31,70 +31,61 @@ sdk.fetch${js.nameType(inflector.pluralize(widget.value("object",widget.id)))}As
       </#if>
     <#elseif widget.type == "cascade">
 
-sdk.fetch${js.nameType(inflector.pluralize(widget.value("object",widget.id)))}AsOptions = async () => {    
-  return [{ 
-    value: 'bj', label: '北京市', 
-    children: [{ 
-      value: 'hd', label: '海淀区', 
-      children: [{ 
-        value: 'zgc', label: '中关村' 
-      },{ 
-        value: 'wdk', label: '五道口' 
-      },{ 
-        value: 'shdi', label: '上地' 
-      }]
-    },{ 
-      value: 'cy', label: '朝阳区', 
-      children: [{ 
-        value: 'cbd', label: 'CBD' 
-      },{ 
-        value: 'sl', label: '三里屯' 
-      }]
-    },{ 
-      value: 'dc', label: '东城区' 
-    },{ 
-      value: 'xc', label: '西城区' 
-    }]
-  },{ 
-    value: 'sh', label: '上海市', 
-    children: [{ 
-      value: 'pd', label: '浦东新区', 
-      children: [{ 
-        value: 'ljz', label: '陆家嘴'
-      },{ 
-        value: 'zj', label: '张江' 
-      }]
-    },{ 
-      value: 'hp', label: '黄浦区' 
-    },{ 
-      value: 'xh', label: '徐汇区' 
-    }]
-  },{ 
-    value: 'gd', label: '广东省', 
-    children: [{ 
-      value: 'gz', label: '广州市', 
-      children: [{ 
-        value: 'th', label: '天河区' 
-      },{ 
-        value: 'yx', label: '越秀区' 
-      }]
-    },{ 
-      value: 'sz', label: '深圳市', 
-      children: [{ 
-        value: 'ns', label: '南山区' 
-      },{ 
-        value: 'ft', label: '福田区' 
-      }]
-    }]
-  },{ 
-    value: 'zj', label: '浙江省', 
-    children: [{ 
-      value: 'hz', label: '杭州市' 
-    },{ 
-      value: 'nb', label: '宁波市' 
-    }]
-  }];
-};
+// 级联数据：按父节点逐级获取（模拟真实 API 逐级调用）
+sdk.${js.nameVariable(widget.value("object",widget.id))}Options = {
+  _root: [
+    { value: 'bj', label: '北京市',     hasChildren: true },
+    { value: 'sh', label: '上海市',     hasChildren: true },
+    { value: 'gd', label: '广东省',     hasChildren: true },
+    { value: 'zj', label: '浙江省',     hasChildren: true },
+  ],
+  bj: [
+    { value: 'hd',   label: '海淀区',   hasChildren: true },
+    { value: 'cy',   label: '朝阳区',   hasChildren: true },
+    { value: 'dc',   label: '东城区',   hasChildren: false },
+    { value: 'xc',   label: '西城区',   hasChildren: false },
+  ],
+  hd: [
+    { value: 'zgc',  label: '中关村',   hasChildren: false },
+    { value: 'wdk',  label: '五道口',   hasChildren: false },
+    { value: 'shdi', label: '上地',     hasChildren: false },
+  ],
+  cy: [
+    { value: 'cbd',  label: 'CBD',      hasChildren: false },
+    { value: 'sl',   label: '三里屯',   hasChildren: false },
+  ],
+  sh: [
+    { value: 'pd',   label: '浦东新区', hasChildren: true },
+    { value: 'hp',   label: '黄浦区',   hasChildren: false },
+    { value: 'xh',   label: '徐汇区',   hasChildren: false },
+  ],
+  pd: [
+    { value: 'ljz',  label: '陆家嘴',   hasChildren: false },
+    { value: 'zj',   label: '张江',     hasChildren: false },
+  ],
+  gd: [
+    { value: 'gz',   label: '广州市',   hasChildren: true },
+    { value: 'sz',   label: '深圳市',   hasChildren: true },
+  ],
+  gz: [
+    { value: 'th',   label: '天河区',   hasChildren: false },
+    { value: 'yx',   label: '越秀区',   hasChildren: false },
+  ],
+  sz: [
+    { value: 'ns',   label: '南山区',   hasChildren: false },
+    { value: 'ft',   label: '福田区',   hasChildren: false },
+  ],
+  zj: [
+    { value: 'hz',   label: '杭州市',   hasChildren: false },
+    { value: 'nb',   label: '宁波市',   hasChildren: false },
+  ],
+}
+
+sdk.fetch${js.nameType(widget.value("object",widget.id))}AsOptions = async (parentValue) => {
+  await new Promise(r => setTimeout(r, 300 + Math.random() * 300))
+  const key = parentValue === null || parentValue === undefined ? '_root' : String(parentValue)
+  return sdk.${js.nameVariable(widget.value("object",widget.id))}Options[key] || []
+}
     <#elseif widget.type == "entry_form" || widget.type == "display_form">
 
 sdk.fetch${js.nameType(objname)} = async (start, limit) => {
