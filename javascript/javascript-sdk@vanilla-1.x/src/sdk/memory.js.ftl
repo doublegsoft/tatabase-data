@@ -110,7 +110,7 @@ sdk.fetch${js.nameType(objname)} = async (start, limit) => {
       </#list>    
   }
 };
-ss
+
     <#elseif widget.type == "paged_table" || widget.type == "excel_form">
 
 sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, limit) => {
