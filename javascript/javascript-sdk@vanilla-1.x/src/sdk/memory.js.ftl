@@ -91,9 +91,9 @@ sdk.fetch${js.nameType(widget.value("object",widget.id))}AsOptions = async (pare
 sdk.fetch${js.nameType(objname)} = async (start, limit) => {
   return {
       <#list widget.children as col>
-        <#if col.type == "date">
+        <#if (col.type!"") == "date">
     ${js.nameVariable(col.id)}: '${tatabase.date()}',  
-        <#elseif col.type == "number">
+        <#elseif (col.type!"") == "number">
     ${js.nameVariable(col.id)}: '${tatabase.number(1, 100)}',  
         <#else>
     ${js.nameVariable(col.id)}: '${tatabase.string(10)}',
