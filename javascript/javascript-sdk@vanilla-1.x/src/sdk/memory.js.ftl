@@ -88,7 +88,7 @@ sdk.fetch${js.nameType(widget.value("object",widget.id))}AsOptions = async (pare
 }
     <#elseif widget.type == "entry_form" || widget.type == "display_form">
 
-sdk.fetch${js.nameType(objname)} = async (start, limit) => {
+sdk.fetch${js.nameType(objname)} = async (params) => {
   return {
       <#list widget.children as col>
         <#if (col.type!"") == "date">
