@@ -98,7 +98,13 @@ sdk.fetch${js.nameType(objname)} = async (params) => {
         <#elseif (col.type!"") == "tags">
     ${js.nameVariable(col.id)}: ['${tatabase.string(10)}','${tatabase.string(10)}','${tatabase.string(10)}'],
         <#elseif (col.type!"") == "images" || (col.type!"") == "files" || (col.type!"") == "videos">
-    ${js.nameVariable(col.id)}: [],  
+    ${js.nameVariable(col.id)}: [{
+      id: '${tatabase.number(1, 100)}', url: '${tatabase.string(10)}',
+    },{
+      id: '${tatabase.number(1, 100)}', url: '${tatabase.string(10)}',
+    },{
+      id: '${tatabase.number(1, 100)}', url: '${tatabase.string(10)}',
+    }],  
         <#else>
     ${js.nameVariable(col.id)}: '${tatabase.string(10)}',
         </#if>
