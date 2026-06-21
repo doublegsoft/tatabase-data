@@ -95,6 +95,10 @@ sdk.fetch${js.nameType(objname)} = async (params) => {
     ${js.nameVariable(col.id)}: '${tatabase.date()}',  
         <#elseif (col.type!"") == "number">
     ${js.nameVariable(col.id)}: '${tatabase.number(1, 100)}',  
+        <#elseif (col.type!"") == "tags">
+    ${js.nameVariable(col.id)}: ['${tatabase.string(10)}','${tatabase.string(10)}','${tatabase.string(10)}'],
+        <#elseif (col.type!"") == "images" || (col.type!"") == "files" || (col.type!"") == "videos">
+    ${js.nameVariable(col.id)}: [],  
         <#else>
     ${js.nameVariable(col.id)}: '${tatabase.string(10)}',
         </#if>
@@ -103,7 +107,8 @@ sdk.fetch${js.nameType(objname)} = async (params) => {
 };
 
     <#elseif widget.type == "paged_table" || widget.type == "fixed_table" || 
-             widget.type == "excel_form" || widget.type == "paged_grid">
+             widget.type == "excel_form" || widget.type == "paged_grid" ||
+             widget.type == "time_grid" || widget.type == "list_view">
 
 sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, limit) => {
   return {
