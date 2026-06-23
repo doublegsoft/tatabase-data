@@ -94,7 +94,9 @@ sdk.fetch${js.nameType(objname)} = async (params) => {
         <#if (col.type!"") == "date">
     ${js.nameVariable(col.id)}: '${tatabase.date()}',  
         <#elseif (col.type!"") == "number">
-    ${js.nameVariable(col.id)}: '${tatabase.number(1, 100)}',  
+    ${js.nameVariable(col.id)}: '${tatabase.number(1, 100)}',
+        <#elseif (col.type!"") == "multiselect">
+    ${js.nameVariable(col.id)}: ['${tatabase.number(1,100)}','${tatabase.number(1,100)}','${tatabase.number(1,100)}'],    
         <#elseif (col.type!"") == "tags">
     ${js.nameVariable(col.id)}: ['${tatabase.string(10)}','${tatabase.string(10)}','${tatabase.string(10)}'],
         <#elseif (col.type!"") == "images" || (col.type!"") == "files" || (col.type!"") == "videos">
