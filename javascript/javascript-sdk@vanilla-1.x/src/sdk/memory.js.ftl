@@ -90,25 +90,43 @@ sdk.fetch${js.nameType(widget.value("object",widget.id))}AsOptions = async (pare
 
 sdk.fetch${js.nameType(objname)} = async (params) => {
   return {
-      <#list widget.children as col>
-        <#if (col.type!"") == "date">
-    ${js.nameVariable(col.id)}: '${tatabase.date()}',  
-        <#elseif (col.type!"") == "number">
-    ${js.nameVariable(col.id)}: '${tatabase.number(1, 100)}',
-        <#elseif (col.type!"") == "multiselect">
-    ${js.nameVariable(col.id)}: ['${tatabase.number(1,100)}','${tatabase.number(1,100)}','${tatabase.number(1,100)}'],    
-        <#elseif (col.type!"") == "tags">
-    ${js.nameVariable(col.id)}: ['${tatabase.string(10)}','${tatabase.string(10)}','${tatabase.string(10)}'],
-        <#elseif (col.type!"") == "images" || (col.type!"") == "files" || (col.type!"") == "videos">
-    ${js.nameVariable(col.id)}: [{
-      id: '${tatabase.number(1, 100)}', url: '${tatabase.string(10)}',
+      <#list widget.children as child>
+        <#if (child.type!"") == "date">
+    ${js.nameVariable(child.id)}: '${tatabase.date()}',  
+        <#elseif (child.type!"") == "number">
+    ${js.nameVariable(child.id)}: '${tatabase.number(1, 100)}',
+        <#elseif (child.type!"") == "select">
+          <#if child.value("data")?starts_with("enum[")>
+    ${js.nameVariable(child.id)}: '${tatabase.enumcode(child.value("data"))}',      
+          <#else>
+    ${js.nameVariable(child.id)}: 'DEF',      
+          </#if>
+        <#elseif (child.type!"") == "multiselect">
+    ${js.nameVariable(child.id)}: ['ABC','DEF','EFG'],    
+        <#elseif (child.type!"") == "tags">
+    ${js.nameVariable(child.id)}: ['${tatabase.string(10)}','${tatabase.string(10)}','${tatabase.string(10)}'],
+        <#elseif child.type == "avatar">
+    ${js.nameVariable(child.id)}: '${tatabase.avatar()}', 
+        <#elseif (child.type!"") == "images">
+    ${js.nameVariable(child.id)}: [{
+      id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.image()}',
     },{
-      id: '${tatabase.number(1, 100)}', url: '${tatabase.string(10)}',
+      id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.image()}',
     },{
-      id: '${tatabase.number(1, 100)}', url: '${tatabase.string(10)}',
+      id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.image()}',
     }],  
+        <#elseif (child.type!"") == "files" || (child.type!"") == "videos">
+    ${js.nameVariable(child.id)}: [{
+      id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.string(10)}',
+    },{
+      id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.string(10)}',
+    },{
+      id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.string(10)}',
+    }],      
+        <#elseif (child.type!"") == "time">
+    ${js.nameVariable(child.id)}: '10:10',
         <#else>
-    ${js.nameVariable(col.id)}: '${tatabase.string(10)}',
+    ${js.nameVariable(child.id)}: '${tatabase.string(10)}',
         </#if>
       </#list>    
   }
@@ -126,14 +144,18 @@ sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, li
         <#if i != 1>
     },{
        </#if>
-        <#list widget.children as col>
-          <#if !col.id??><#continue></#if>
-          <#if col.type == "date">
-      ${js.nameVariable(col.id)}: '${tatabase.date()}',  
-          <#elseif col.type == "number">
-      ${js.nameVariable(col.id)}: '${tatabase.number(1, 100)}',  
+        <#list widget.children as child>
+          <#if !child.id??><#continue></#if>
+          <#if child.type == "date">
+      ${js.nameVariable(child.id)}: '${tatabase.date()}',  
+          <#elseif child.type == "number">
+      ${js.nameVariable(child.id)}: '${tatabase.number(1, 100)}',  
+          <#elseif child.type == "select">
+      ${js.nameVariable(child.id)}: 'DEF',  
+          <#elseif child.type == "multiselect">
+      ${js.nameVariable(child.id)}: ['ABC', 'DEF', 'EFG'],  
           <#else>
-      ${js.nameVariable(col.id)}: '${tatabase.string(10)}',
+      ${js.nameVariable(child.id)}: '${tatabase.string(10)}',
           </#if>
         </#list>    
       </#list>  
