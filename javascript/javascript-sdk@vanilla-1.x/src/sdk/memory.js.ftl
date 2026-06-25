@@ -6,12 +6,13 @@ if (typeof sdk === 'undefined') {
 <#list app.pages as page>
   <#list page.widgets as widget>
     <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
-    <#assign objname = widget.value("object", widget.id)>
+    <#assign url = valuebase.url(widget.value("data", widget.id))>
+    <#assign objname = url.resource>
     <#assign visited_widgets += {objname: widget}>
     <#if (widget.type == "select" || widget.type == "multiselect")>
       <#if !widget.value("data","")?starts_with("enum[")>
 
-sdk.fetch${js.nameType(inflector.pluralize(widget.value("object",widget.id)))}AsOptions = async () => {
+sdk.fetch${js.nameType(inflector.pluralize(objname))}AsOptions = async () => {
   return [{
     value: 'ABC', label: '${tatabase.string(5)}',
   },{
@@ -32,7 +33,7 @@ sdk.fetch${js.nameType(inflector.pluralize(widget.value("object",widget.id)))}As
     <#elseif widget.type == "cascade">
 
 // 级联数据：按父节点逐级获取（模拟真实 API 逐级调用）
-sdk.${js.nameVariable(widget.value("object",widget.id))}Options = {
+sdk.${js.nameVariable(objname)}Options = {
   _root: [
     { value: 'bj', label: '北京市',     hasChildren: true },
     { value: 'sh', label: '上海市',     hasChildren: true },
@@ -81,10 +82,10 @@ sdk.${js.nameVariable(widget.value("object",widget.id))}Options = {
   ],
 }
 
-sdk.fetch${js.nameType(widget.value("object",widget.id))}AsOptions = async (parentValue) => {
+sdk.fetch${js.nameType(objname)}AsOptions = async (parentValue) => {
   await new Promise(r => setTimeout(r, 300 + Math.random() * 300))
   const key = parentValue === null || parentValue === undefined ? '_root' : String(parentValue)
-  return sdk.${js.nameVariable(widget.value("object",widget.id))}Options[key] || []
+  return sdk.${js.nameVariable(objname)}Options[key] || []
 }
     <#elseif widget.type == "entry_form" || widget.type == "display_form">
 
