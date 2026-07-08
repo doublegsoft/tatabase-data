@@ -79,9 +79,19 @@
   <#if prefix == attr.parent.name>
     <#local prefix = "">
   </#if>
+  <#-- prefix是object name的简称，开头或者结尾的单词，就忽略-->
+  <#--  <#if attr.parent.name?starts_with(prefix)>
+    <#local prefix = "">
+  </#if>  -->
   <#if attr == ''><#return 'UNKNOWN'></#if>
   <#local naming = java>
   <#if attr.name == 'id'>
+    <#if prefix != "" && prefix != "id">
+      <#return naming.nameVariable(prefix) + "Id">
+    </#if>
+    <#if attr.type.custom && attr.identifiable>
+      <#return naming.nameVariable(attr.parent.name) + 'Id'>
+    </#if>
     <#if prefix?ends_with(attr.parent.name)>
       <#return naming.nameVariable(prefix) + 'Id'>
     <#elseif prefix != "">
@@ -92,7 +102,11 @@
   <#if attr.type.custom>
     <#assign refObj = model.findObjectByName(attr.type.name)!''>
     <#assign refObjIdAttrs = get_id_attributes(refObj)>
-    <#if refObjIdAttrs?size == 0>
+    <#if attr.name == "id">
+      <#return naming.nameVariable(refObj.name) + "Id">
+    </#if>
+    <#return naming.nameVariable(attr.name) + "Id">
+    <#--  <#if refObjIdAttrs?size == 0>
       <#return naming.nameVariable(attr.name) + 'Id'>
     </#if>
     <#if refObjIdAttrs[0].name?starts_with(refObj.name)>
@@ -101,62 +115,24 @@
       <#else>
         <#return naming.nameVariable(prefix + '_' + attr.name) + "Id">)>
       </#if>
+    <#elseif attr.name?ends_with(refObj.name)>
+      <#return naming.nameVariable(attr.name) + "Id">
     </#if>
     <#assign alias = naming.nameVariable(refObj.name) + naming.nameType(refObjIdAttrs[0].name)>
     <#if alias?lower_case?index_of(naming.nameVariable(attr.name)?lower_case) != -1>
       <#return alias>
     <#else>
       <#return naming.nameVariable(attr.name) + naming.nameType(refObj.name) + naming.nameType(refObjIdAttrs[0].name)>
-    </#if>
+    </#if>  -->
   </#if>
-  <#if attr.name == 'code'>
+  <#if attr.name == 'name' || attr.name == 'type' || attr.name == 'text' || attr.name == 'group' || attr.name == 'code'>
     <#if attr.parent.name?starts_with("$")>
-      <#return naming.nameVariable(attr.getLabelledOptions("original")["object"]) + 'Code'>
+      <#return naming.nameVariable(attr.getLabelledOptions("original")["object"]) + java.nameType(attr.name)>
     </#if>
     <#if prefix == "" || attr.name?starts_with(prefix)>
-      <#return naming.nameVariable(attr.parent.name) + 'Code'>
+      <#return naming.nameVariable(attr.parent.name) + java.nameType(attr.name)>
     <#else>
-      <#return naming.nameVariable(prefix) + 'Code'>  
-    </#if>
-  </#if>
-  <#if attr.name == 'name'>
-    <#if attr.parent.name?starts_with("$")>
-      <#return naming.nameVariable(attr.getLabelledOptions("original")["object"]) + 'Name'>
-    </#if>
-    <#if prefix == "" || attr.name?starts_with(prefix)>
-      <#return naming.nameVariable(attr.parent.name) + 'Name'>
-    <#else>
-      <#return naming.nameVariable(prefix) + 'Name'>  
-    </#if>
-  </#if>
-  <#if attr.name == 'type'>
-    <#if attr.parent.name?starts_with("$")>
-      <#return naming.nameVariable(attr.getLabelledOptions("original")["object"]) + 'Type'>
-    </#if>
-    <#if prefix == "" || attr.name?starts_with(prefix)>
-      <#return naming.nameVariable(attr.parent.name) + 'Type'>
-    <#else>
-      <#return naming.nameVariable(prefix) + 'Type'>  
-    </#if>
-  </#if>
-  <#if attr.name == 'text'>
-    <#if attr.parent.name?starts_with("$")>
-      <#return naming.nameVariable(attr.getLabelledOptions("original")["object"]) + 'Text'>
-    </#if>
-    <#if prefix == "" || attr.name?starts_with(prefix)>
-      <#return naming.nameVariable(attr.parent.name) + 'Text'>
-    <#else>
-      <#return naming.nameVariable(prefix) + 'Text'>  
-    </#if>
-  </#if>
-  <#if attr.name == 'group'>
-    <#if attr.parent.name?starts_with("$")>
-      <#return naming.nameVariable(attr.getLabelledOptions("original")["object"]) + 'Group'>
-    </#if>
-    <#if prefix == "" || attr.name?starts_with(prefix)>
-      <#return naming.nameVariable(attr.parent.name) + 'Group'>
-    <#else>
-      <#return naming.nameVariable(prefix) + 'Group'>  
+      <#return naming.nameVariable(prefix) + java.nameType(attr.name)>  
     </#if>
   </#if>
   <#if attr.type.primitive>
@@ -171,6 +147,15 @@
   <#else>
     <#return naming.nameVariable(prefix + '_' + attr.name)>  
   </#if>
+</#function>
+
+<#function match_aggregate_attribute aggObj dataAttr>
+  <#list aggObj.attributes as aggAttr>
+    <#if !aggAttr.type.custom><#continue></#if>
+    <#if aggAttr.type.name == dataAttr.parent.name>
+      <#return aggAttr>
+    </#if>
+  </#list>
 </#function>
 
 <#--
@@ -480,7 +465,8 @@
     <#return typebase.typename(attr.type.name, language, 'String')>
   <#elseif attr.type.custom>
     <#assign refObj = model.findObjectByName(attr.type.name)>
-    <#return type_attribute_primitive(attr.directRelationship.targetAttribute)>
+    <#return type_attribute_primitive(refObj.getIdentifiableAttribute())>
+    <#--  <#return type_attribute_primitive(attr.directRelationship.targetAttribute)>  -->
   <#elseif attr.type.domain>
     <#assign exprDomain = attr.type.toString()>
     <#if exprDomain?index_of('&') == 0>
@@ -749,6 +735,17 @@
     </#if>
   </#list>
   <#return ret>
+</#function>
+
+<#function get_attribute_proxy proxyObj attr>
+  <#list proxyObj.attributes as proxyAttr>
+    <#if !proxyAttr.isLabelled("original")><#continue></#if>
+    <#local origObjName = proxyAttr.getLabelledOption("original","object")>
+    <#local origAttrName = proxyAttr.getLabelledOption("original","attribute")>
+    <#if attr.parent.name == origObjName && attr.name == origAttrName>
+      <#return proxyAttr>
+    </#if>
+  </#list>
 </#function>
 
 <#--
