@@ -136,7 +136,7 @@ sdk.fetch${js.nameType(objname)} = async (params) => {
     <#elseif widget.type == "paged_table" || widget.type == "fixed_table" || 
              widget.type == "excel_form" || widget.type == "paged_grid" ||
              widget.type == "time_grid" || widget.type == "list_view" ||
-             widget.type == "split_list">
+             widget.type == "grid_view" || widget.type == "split_list">
 
 sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, limit) => {
   return {
@@ -176,6 +176,7 @@ sdk.fetch${js.nameType(inflector.pluralize(groupRes.resource))} = async (params,
         <#if i != 1>
     },{
        </#if>
+      ${js.nameVariable(groupRes.resource)}Id: '${i?string}',   
       ${js.nameVariable(groupRes.resource)}Name: '${tatabase.string(10)}',  
       </#list>  
     }]
