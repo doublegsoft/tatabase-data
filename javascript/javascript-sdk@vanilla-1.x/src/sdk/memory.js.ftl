@@ -1,3 +1,5 @@
+<#import "/$/modelbase.ftl" as modelbase>
+<#import "/$/tatabase4js.ftl" as tatabase4js>
 let sdk
 if (typeof sdk === 'undefined') {
   sdk = {};
@@ -219,5 +221,27 @@ sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, li
     </#if>
   </#list>
 </#list>
-    
+<#list model.objects as obj>
+
+sdk.fetch${js.nameType(obj.name)} = async (params) => {
+  return {
+  <#list obj.attributes as attr>
+    ${modelbase.get_attribute_sql_name(attr)}: ${tatabase4js.get_attribute_test_value(attr)},
+  </#list>    
+  };
+};
+
+sdk.fetch${js.nameType(modelbase.get_object_plural(obj))} = async (params) => {
+  return [{
+  <#list 1..20 as idx>
+    <#if idx != 1>
+  },{  
+    </#if>
+    <#list obj.attributes as attr>
+    ${modelbase.get_attribute_sql_name(attr)}: ${tatabase4js.get_attribute_test_value(attr)},
+    </#list>    
+  </#list>    
+  }];
+};
+</#list>
 export default sdk
