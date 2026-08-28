@@ -232,16 +232,19 @@ sdk.fetch${js.nameType(obj.name)} = async (params) => {
 };
 
 sdk.fetch${js.nameType(modelbase.get_object_plural(obj))} = async (params) => {
-  return [{
+  return {
+    total: 100,
+    data: [{
   <#list 1..20 as idx>
     <#if idx != 1>
-  },{  
+    },{  
     </#if>
     <#list obj.attributes as attr>
-    ${modelbase.get_attribute_sql_name(attr)}: ${tatabase4js.get_attribute_test_value(attr)},
+      ${modelbase.get_attribute_sql_name(attr)}: ${tatabase4js.get_attribute_test_value(attr)},
     </#list>    
   </#list>    
-  }];
+    }]
+  };
 };
 </#list>
 export default sdk
