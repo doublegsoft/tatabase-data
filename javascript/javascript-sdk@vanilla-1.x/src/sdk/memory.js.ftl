@@ -1,5 +1,44 @@
 <#import "/$/modelbase.ftl" as modelbase>
 <#import "/$/tatabase4js.ftl" as tatabase4js>
+<#macro print_input_value input indent>
+  <#if (input.type!"") == "date">
+${""?left_pad(indent)}${js.nameVariable(input.id)}: '${tatabase.date()}',
+  <#elseif (input.type!"") == "number">
+${""?left_pad(indent)}${js.nameVariable(input.id)}: '${tatabase.number(1, 100)}',
+  <#elseif (input.type!"") == "select">
+    <#if input.value("data")?starts_with("enum[")>
+${""?left_pad(indent)}${js.nameVariable(input.id)}: '${tatabase.enumcode(input.value("data"))}',
+    <#else>
+${""?left_pad(indent)}${js.nameVariable(input.id)}: 'DEF',
+    </#if>
+  <#elseif (input.type!"") == "multiselect">
+${""?left_pad(indent)}${js.nameVariable(input.id)}: ['ABC','DEF','EFG'],
+  <#elseif (input.type!"") == "tags">
+${""?left_pad(indent)}${js.nameVariable(input.id)}: ['${tatabase.string(10)}','${tatabase.string(10)}','${tatabase.string(10)}'],
+  <#elseif (input.type!"") == "avatar">
+${""?left_pad(indent)}${js.nameVariable(input.id)}: '${tatabase.avatar()}',
+  <#elseif (input.type!"") == "images">
+${""?left_pad(indent)}${js.nameVariable(input.id)}: [{
+${""?left_pad(indent)}  id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.image()}',
+${""?left_pad(indent)}},{
+${""?left_pad(indent)}  id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.image()}',
+${""?left_pad(indent)}},{
+${""?left_pad(indent)}  id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.image()}',
+${""?left_pad(indent)}],
+  <#elseif (input.type!"") == "files" || (input.type!"") == "videos">
+${""?left_pad(indent)}${js.nameVariable(input.id)}: [{
+${""?left_pad(indent)}  id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.string(10)}',
+${""?left_pad(indent)}},{
+${""?left_pad(indent)}  id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.string(10)}',
+${""?left_pad(indent)}},{
+${""?left_pad(indent)}  id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.string(10)}',
+${""?left_pad(indent)}],
+  <#elseif (input.type!"") == "time">
+${""?left_pad(indent)}${js.nameVariable(input.id)}: '10:10',
+  <#else>
+${""?left_pad(indent)}${js.nameVariable(input.id)}: '${tatabase.string(10)}',
+  </#if>
+</#macro>
 let sdk
 if (typeof sdk === 'undefined') {
   sdk = {};
@@ -68,43 +107,7 @@ sdk.fetch${js.nameType(inflector.pluralize(opt.name))}AsOptions = async (parentV
 sdk.fetch${js.nameType(objname)} = async (params) => {
   return {
       <#list widget.children as child>
-        <#if (child.type!"") == "date">
-    ${js.nameVariable(child.id)}: '${tatabase.date()}',  
-        <#elseif (child.type!"") == "number">
-    ${js.nameVariable(child.id)}: '${tatabase.number(1, 100)}',
-        <#elseif (child.type!"") == "select">
-          <#if child.value("data")?starts_with("enum[")>
-    ${js.nameVariable(child.id)}: '${tatabase.enumcode(child.value("data"))}',      
-          <#else>
-    ${js.nameVariable(child.id)}: 'DEF',      
-          </#if>
-        <#elseif (child.type!"") == "multiselect">
-    ${js.nameVariable(child.id)}: ['ABC','DEF','EFG'],    
-        <#elseif (child.type!"") == "tags">
-    ${js.nameVariable(child.id)}: ['${tatabase.string(10)}','${tatabase.string(10)}','${tatabase.string(10)}'],
-        <#elseif child.type == "avatar">
-    ${js.nameVariable(child.id)}: '${tatabase.avatar()}', 
-        <#elseif (child.type!"") == "images">
-    ${js.nameVariable(child.id)}: [{
-      id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.image()}',
-    },{
-      id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.image()}',
-    },{
-      id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.image()}',
-    }],  
-        <#elseif (child.type!"") == "files" || (child.type!"") == "videos">
-    ${js.nameVariable(child.id)}: [{
-      id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.string(10)}',
-    },{
-      id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.string(10)}',
-    },{
-      id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.string(10)}',
-    }],      
-        <#elseif (child.type!"") == "time">
-    ${js.nameVariable(child.id)}: '10:10',
-        <#else>
-    ${js.nameVariable(child.id)}: '${tatabase.string(10)}',
-        </#if>
+<@print_input_value input=child indent=4 />
       </#list>    
   }
 };
@@ -198,6 +201,22 @@ sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, li
 };    
     </#if>
   </#list>
+  <#if page.value("data") != ""><#-- 页面定义的数据来源 -->
+    <#assign url = valuebase.url(page.value("data"))>
+    <#if visited_resources[url.resource]??><#continue></#if>
+    <#assign visited_resources += {url.resource:url.resource}>
+
+sdk.fetch${js.nameType(url.resource)} = async (params) => {
+  return {
+    <#list page.widgets as widget>
+      <#if !widget.value("data")?starts_with("$" + url.resource)><#continue></#if>
+      <#list widget.children as child>
+<@print_input_value input=child indent=4 />
+      </#list>
+    </#list>
+  };
+};
+  </#if>
 </#list>
 <#list model.objects as obj>
   <#if visited_resources[obj.name]??><#continue></#if>
