@@ -4,17 +4,19 @@ let sdk
 if (typeof sdk === 'undefined') {
   sdk = {};
 }
-<#assign visited_widgets = {}>
+<#assign visited_resources = {}>
 <#list app.pages as page>
   <#list page.widgets as widget>
-    <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
+    <#if !widget.id??><#continue></#if>
     <#assign url = valuebase.url(widget.value("data", widget.id))>
     <#assign objname = url.resource>
-    <#assign visited_widgets += {objname: widget}>
+    <#if objname?starts_with("$")><#continue></#if><#-- 引用数据，忽略 -->
     <#if (widget.type == "select" || widget.type == "multiselect") &&
          widget.value("data","")?starts_with("enum[") &&
          typebase.enumtype(widget.value("data"))?size == 1>
       <#assign opt = typebase.enumtype(widget.value("data"))?first>
+      <#if visited_resources[opt.name + "Options"]??><#continue></#if>
+      <#assign visited_resources += {opt.name + "Options":opt.name}>
 
 sdk.fetch${js.nameType(inflector.pluralize(opt.name))}AsOptions = async () => {
   await new Promise(r => setTimeout(r, 300 + Math.random() * 300))
@@ -38,6 +40,8 @@ sdk.fetch${js.nameType(inflector.pluralize(opt.name))}AsOptions = async () => {
              widget.value("data","")?starts_with("enum[") &&
              typebase.enumtype(widget.value("data"))?size == 1>
       <#assign opt = typebase.enumtype(widget.value("data"))?first>
+      <#if visited_resources[opt.name + "Options"]??><#continue></#if>
+      <#assign visited_resources += {opt.name + "Options":opt.name}>
 
 sdk.fetch${js.nameType(inflector.pluralize(opt.name))}AsOptions = async (parentValue) => {
   await new Promise(r => setTimeout(r, 300 + Math.random() * 300))
@@ -58,6 +62,8 @@ sdk.fetch${js.nameType(inflector.pluralize(opt.name))}AsOptions = async (parentV
   }];
 }
     <#elseif widget.type == "entry_form" || widget.type == "display_form">
+      <#if visited_resources[objname]??><#continue></#if>
+      <#assign visited_resources += {objname:objname}>
 
 sdk.fetch${js.nameType(objname)} = async (params) => {
   return {
@@ -107,6 +113,8 @@ sdk.fetch${js.nameType(objname)} = async (params) => {
              widget.type == "excel_form" || widget.type == "paged_grid" ||
              widget.type == "time_grid" || widget.type == "list_view" ||
              widget.type == "grid_view" || widget.type == "split_list">
+      <#if visited_resources[inflector.pluralize(objname)]??><#continue></#if>
+      <#assign visited_resources += {inflector.pluralize(objname):objname}>
 
 sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, limit) => {
   return {
@@ -137,6 +145,8 @@ sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, li
       <#assign group = widget.value("group")>
       <#if group != "">
         <#assign groupRes = valuebase.url(group)>
+        <#if visited_resources[inflector.pluralize(groupRes.resource)]??><#continue></#if>
+        <#assign visited_resources += {inflector.pluralize(groupRes.resource):objname}>
 
 sdk.fetch${js.nameType(inflector.pluralize(groupRes.resource))} = async (params, start, limit) => {
   return {
@@ -190,6 +200,8 @@ sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, li
   </#list>
 </#list>
 <#list model.objects as obj>
+  <#if visited_resources[obj.name]??><#continue></#if>
+  <#assign visited_resources += {obj.name:objname}>
 
 sdk.fetch${js.nameType(obj.name)} = async (params) => {
   return {
@@ -198,6 +210,8 @@ sdk.fetch${js.nameType(obj.name)} = async (params) => {
   </#list>    
   };
 };
+  <#if visited_resources[modelbase.get_object_plural(obj)]??><#continue></#if>
+  <#assign visited_resources += {modelbase.get_object_plural(obj):obj.name}>
 
 sdk.fetch${js.nameType(modelbase.get_object_plural(obj))} = async (params) => {
   return {
