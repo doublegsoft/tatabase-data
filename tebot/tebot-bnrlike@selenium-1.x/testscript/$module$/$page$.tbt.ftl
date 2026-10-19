@@ -38,6 +38,7 @@ input("//input[@data-test='${js.nameVariable(input.id)}']" = "${tatabase.value(i
 <#-- 如果存在excel form，则处理excel form的编辑 -->
 <#-------------------------------------------->
 <#list page.widgets as widget>
+  <#if !widget.type??><#continue></#if>
   <#if widget.type != "excel_form"><#continue></#if>
   <#if widget.ancestor("tab")??>
     <#assign tab = widget.ancestor("tab")>
