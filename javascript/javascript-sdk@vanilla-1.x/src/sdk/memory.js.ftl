@@ -24,7 +24,7 @@ ${""?left_pad(indent)}},{
 ${""?left_pad(indent)}  id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.image()}',
 ${""?left_pad(indent)}},{
 ${""?left_pad(indent)}  id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.image()}',
-${""?left_pad(indent)}],
+${""?left_pad(indent)}}],
   <#elseif (input.type!"") == "files" || (input.type!"") == "videos">
 ${""?left_pad(indent)}${js.nameVariable(input.id)}: [{
 ${""?left_pad(indent)}  id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.string(10)}',
@@ -32,7 +32,7 @@ ${""?left_pad(indent)}},{
 ${""?left_pad(indent)}  id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.string(10)}',
 ${""?left_pad(indent)}},{
 ${""?left_pad(indent)}  id: '${tatabase.number(1, 100, 0)}', url: '${tatabase.string(10)}',
-${""?left_pad(indent)}],
+${""?left_pad(indent)}}],
   <#elseif (input.type!"") == "time">
 ${""?left_pad(indent)}${js.nameVariable(input.id)}: '10:10',
   <#else>
