@@ -6,13 +6,16 @@ ${""?left_pad(indent)}${js.nameVariable(input.id)}: '${tatabase.date()}',
   <#elseif (input.type!"") == "number">
 ${""?left_pad(indent)}${js.nameVariable(input.id)}: '${tatabase.number(1, 100)}',
   <#elseif (input.type!"") == "select">
-    <#if input.value("data")?starts_with("enum[")>
-${""?left_pad(indent)}${js.nameVariable(input.id)}: '${tatabase.enumcode(input.value("data"))}',
+    <#if input.value("data")?starts_with("enum[") && input.value("data")?contains(":")>
+      <#assign opts = typebase.enumtype(input.value("data"))>
+${""?left_pad(indent)}${js.nameVariable(input.id)}: '${opts[1].code}',
     <#else>
-${""?left_pad(indent)}${js.nameVariable(input.id)}: 'DEF',
+${""?left_pad(indent)}${js.nameVariable(input.id)}: '10',
     </#if>
+  <#elseif (input.type!"") == "cascade">
+${""?left_pad(indent)}${js.nameVariable(input.id)}: ['10','20','30'],
   <#elseif (input.type!"") == "multiselect">
-${""?left_pad(indent)}${js.nameVariable(input.id)}: ['ABC','DEF','EFG'],
+${""?left_pad(indent)}${js.nameVariable(input.id)}: ['ABC','BCD','CDE'],
   <#elseif (input.type!"") == "tags">
 ${""?left_pad(indent)}${js.nameVariable(input.id)}: ['${tatabase.string(10)}','${tatabase.string(10)}','${tatabase.string(10)}'],
   <#elseif (input.type!"") == "avatar">
@@ -60,19 +63,19 @@ if (typeof sdk === 'undefined') {
 sdk.fetch${js.nameType(inflector.pluralize(opt.name))}AsOptions = async () => {
   await new Promise(r => setTimeout(r, 300 + Math.random() * 300))
   return [{
-    ${js.nameVariable(opt.code)}: '10', ${js.nameVariable(opt.text)}: '${tatabase.string(5)}',
+    value: '10', label: '${tatabase.string(5)}',
   },{
-    ${js.nameVariable(opt.code)}: '20', ${js.nameVariable(opt.text)}: '${tatabase.string(5)}',
+    value: '20', label: '${tatabase.string(5)}',
   },{
-    ${js.nameVariable(opt.code)}: '30', ${js.nameVariable(opt.text)}: '${tatabase.string(5)}',
+    value: '30', label: '${tatabase.string(5)}',
   },{
-    ${js.nameVariable(opt.code)}: '40', ${js.nameVariable(opt.text)}: '${tatabase.string(5)}',
+    value: '40', label: '${tatabase.string(5)}',
   },{
-    ${js.nameVariable(opt.code)}: '50', ${js.nameVariable(opt.text)}: '${tatabase.string(5)}',
+    value: '50', label: '${tatabase.string(5)}',
   },{
-    ${js.nameVariable(opt.code)}: '60', ${js.nameVariable(opt.text)}: '${tatabase.string(5)}',
+    value: '60', label: '${tatabase.string(5)}',
   },{
-    ${js.nameVariable(opt.code)}: '70', ${js.nameVariable(opt.text)}: '${tatabase.string(5)}',
+    value: '70', label: '${tatabase.string(5)}',
   }];
 };
     <#elseif widget.type == "cascade" &&
@@ -85,19 +88,19 @@ sdk.fetch${js.nameType(inflector.pluralize(opt.name))}AsOptions = async () => {
 sdk.fetch${js.nameType(inflector.pluralize(opt.name))}AsOptions = async (parentValue) => {
   await new Promise(r => setTimeout(r, 300 + Math.random() * 300))
   return [{
-    ${js.nameVariable(opt.code)}: '10', ${js.nameVariable(opt.text)}: '${tatabase.string(5)}',
+    value: '10', label: '${tatabase.string(5)}',
   },{
-    ${js.nameVariable(opt.code)}: '20', ${js.nameVariable(opt.text)}: '${tatabase.string(5)}',
+    value: '20', label: '${tatabase.string(5)}',
   },{
-    ${js.nameVariable(opt.code)}: '30', ${js.nameVariable(opt.text)}: '${tatabase.string(5)}',
+    value: '30', label: '${tatabase.string(5)}',
   },{
-    ${js.nameVariable(opt.code)}: '40', ${js.nameVariable(opt.text)}: '${tatabase.string(5)}',
+    value: '40', label: '${tatabase.string(5)}',
   },{
-    ${js.nameVariable(opt.code)}: '50', ${js.nameVariable(opt.text)}: '${tatabase.string(5)}',
+    value: '50', label: '${tatabase.string(5)}',
   },{
-    ${js.nameVariable(opt.code)}: '60', ${js.nameVariable(opt.text)}: '${tatabase.string(5)}',
+    value: '60', label: '${tatabase.string(5)}',
   },{
-    ${js.nameVariable(opt.code)}: '70', ${js.nameVariable(opt.text)}: '${tatabase.string(5)}',
+    value: '70', label: '${tatabase.string(5)}',
   }];
 }
     <#elseif widget.type == "entry_form" || widget.type == "display_form">
@@ -134,9 +137,9 @@ sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, li
           <#elseif child.type == "number">
       ${js.nameVariable(child.id)}: '${tatabase.number(1, 100)}',  
           <#elseif child.type == "select">
-      ${js.nameVariable(child.id)}: 'DEF',  
+      ${js.nameVariable(child.id)}: 'BCD',  
           <#elseif child.type == "multiselect">
-      ${js.nameVariable(child.id)}: ['ABC', 'DEF', 'EFG'],  
+      ${js.nameVariable(child.id)}: ['ABC', 'BCD', 'CDE'],  
           <#else>
       ${js.nameVariable(child.id)}: '${tatabase.string(10)}',
           </#if>
@@ -221,6 +224,15 @@ sdk.fetch${js.nameType(url.resource)} = async (params) => {
 <#list model.objects as obj>
   <#if visited_resources[obj.name]??><#continue></#if>
   <#assign visited_resources += {obj.name:objname}>
+
+sdk.save${js.nameType(obj.name)} = async (params) => {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  return {
+    success: true,
+    data: params,
+    message: '保存成功',
+  };
+};
 
 sdk.fetch${js.nameType(obj.name)} = async (params) => {
   return {
