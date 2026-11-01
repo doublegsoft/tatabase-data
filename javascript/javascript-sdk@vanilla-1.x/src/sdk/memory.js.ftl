@@ -225,15 +225,6 @@ sdk.fetch${js.nameType(url.resource)} = async (params) => {
   <#if visited_resources[obj.name]??><#continue></#if>
   <#assign visited_resources += {obj.name:objname}>
 
-sdk.save${js.nameType(obj.name)} = async (params) => {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  return {
-    success: true,
-    data: params,
-    message: '保存成功',
-  };
-};
-
 sdk.fetch${js.nameType(obj.name)} = async (params) => {
   return {
   <#list obj.attributes as attr>
@@ -257,6 +248,20 @@ sdk.fetch${js.nameType(modelbase.get_object_plural(obj))} = async (params) => {
     </#list>    
   </#list>    
     }]
+  };
+};
+</#list>
+<#assign visited_resources = {}>
+<#list model.objects as obj>
+  <#if visited_resources[obj.name]??><#continue></#if>
+  <#assign visited_resources += {obj.name:objname}>
+
+sdk.save${js.nameType(obj.name)} = async (params) => {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  return {
+    success: true,
+    data: params,
+    message: '保存成功',
   };
 };
 </#list>
