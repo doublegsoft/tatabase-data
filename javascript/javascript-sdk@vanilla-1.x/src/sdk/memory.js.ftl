@@ -50,7 +50,8 @@ if (typeof sdk === 'undefined') {
 <#list app.pages as page>
   <#list page.widgets as widget>
     <#if !widget.id??><#continue></#if>
-    <#assign url = valuebase.url(widget.value("data", widget.id))>
+    <#if widget.value("data") == ""><#continue></#if>
+    <#assign url = valuebase.url(widget.value("data"))>
     <#assign objname = url.resource>
     <#if objname?starts_with("$")><#continue></#if><#-- 引用数据，忽略 -->
     <#if (widget.type == "select" || widget.type == "multiselect") &&
@@ -137,9 +138,23 @@ sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, li
           <#elseif child.type == "number">
       ${js.nameVariable(child.id)}: '${tatabase.number(1, 100)}',  
           <#elseif child.type == "select">
-      ${js.nameVariable(child.id)}: 'BCD',  
+            <#if child.value("data") == "">
+      ${js.nameVariable(child.id)}: 'BCD', 
+            <#elseif child.value("data")?starts_with("enum[") && child.value("data")?contains(":")>
+              <#assign vals = typebase.enumtype(child.value("data"))>
+      ${js.nameVariable(child.id)}: '${vals[1].code}', 
+            <#elseif child.value("data")?starts_with("enum[")>
+      ${js.nameVariable(child.id)}: '2', 
+            </#if>
           <#elseif child.type == "multiselect">
+            <#if child.value("data") == "">
       ${js.nameVariable(child.id)}: ['ABC', 'BCD', 'CDE'],  
+            <#elseif child.value("data")?starts_with("enum[") && child.value("data")?contains(":")>
+              <#assign vals = typebase.enumtype(child.value("data"))>
+      ${js.nameVariable(child.id)}: ['${vals[0].code}', '${vals[1].code}'],  
+            <#elseif child.value("data")?starts_with("enum[")>
+      ${js.nameVariable(child.id)}: ['1','2','3'], 
+            </#if>
           <#else>
       ${js.nameVariable(child.id)}: '${tatabase.string(10)}',
           </#if>
