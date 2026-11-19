@@ -184,9 +184,10 @@ sdk.fetch${js.nameType(inflector.pluralize(groupRes.resource))} = async (params,
   };
 };
       </#if>
-    <#elseif widget.type == "chart">
-
-sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, limit) => {
+    <#elseif widget.type == "chart"><#-- chart数据单独处理 -->
+      <#if visited_resources[objname + "ChartData"]??><#continue></#if>
+      <#assign visited_resources += {objname + "ChartData":""}>
+sdk.fetch${js.nameType(inflector.pluralize(objname))}AsChartData = async (params, start, limit) => {
   return {
     total: 24,
     data: [
